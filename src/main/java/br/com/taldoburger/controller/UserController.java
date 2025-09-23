@@ -22,14 +22,16 @@ public class UserController {
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
 
+    /*
     @PostMapping("/login")
     public ResponseEntity<User> loginUser(@RequestBody User user) {
-        User authenticateUser = userService.loginUser(user.getUsername(), user.getPassword());
+        User authenticateUser = userService.registerUser(user.getUsername(), user.getPassword());
         if (authenticateUser != null)
             return new ResponseEntity<>(authenticateUser, HttpStatus.OK);
         else
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
+     */
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
