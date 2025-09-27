@@ -17,7 +17,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Define que nenhuma criptografia será usada
         return NoOpPasswordEncoder.getInstance();
     }
 
@@ -26,7 +25,14 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/users/registro").permitAll() // Apenas o registro é público
+                        // --- Linha corrigida ---
+                        .requestMatchers(
+                                "/cadastro.html", // Permite acesso à página de cadastro
+                                "/login.html",    // Permite acesso à página de login
+                                "/css/**",        // Permite acesso a todos os arquivos na pasta css
+                                "/js/**",         // Permite acesso a todos os arquivos na pasta js
+                                "/users/registro" // Permite acesso à API de registro
+                        ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )

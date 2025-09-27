@@ -1,0 +1,71 @@
+.admin-main {
+    padding-top: 120px;
+    padding-bottom: 80px;
+    background-color: #f4f4f4;
+}
+.form-container, .table-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+.form-buttons {
+    display: flex;
+    gap: 10px;
+}
+.btn-secondary {
+    background-color: #6c757d;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+#product-table, #user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#product-table th, #product-table td, #user-table th, #user-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+#product-table th, #user-table th {
+    background-color: #f8f9fa;
+}
+.action-buttons button, .action-buttons select {
+    margin-right: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+}
+.edit-btn { background-color: #ffc107; }
+.delete-btn { background-color: #dc3545; }
+
+.section-divider {
+    border: 0;
+    height: 2px;
+    background-color: #eee;
+    margin: 60px 0;
+}
+.role-select {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
