@@ -30,6 +30,78 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    public User createUser(User user) {
+        // Verifica se o username já existe
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            throw new RuntimeException("Username já existe");
+        }
+        
+        // Verifica se o email já existe
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            throw new RuntimeException("Email já existe");
+        }
+        
+        // Define role padrão se não especificado
+        if (user.getRole() == null) {
+            user.setRole(User.UserRole.USER);
+        }
+        
+        return userRepository.save(user);
+    }
+
+    public User updateUser(Long id, User updatedUser) {
+        User existingUser = userRepository.findById(id).orElse(null);
+        if (existingUser == null) {
+            return null;
+        }
+
+        // Verifica se o novo username já existe (exceto para o próprio usuário)
+        User userWithSameUsername = userRepository.findByUsername(updatedUser.getUsername());
+        if (userWithSameUsername != null && !userWithSameUsername.getId().equals(id)) {
+            throw new RuntimeException("Username já existe");
+        }
+
+        // Verifica se o novo email já existe (exceto para o próprio usuário)
+        User userWithSameEmail = userRepository.findByEmail(updatedUser.getEmail());
+        if (userWithSameEmail != null && !userWithSameEmail.getId().equals(id)) {
+            throw new RuntimeException("Email já existe");
+        }
+
+        // Atualiza os campos
+        existingUser.setName(updatedUser.getName());
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setEmail(updatedUser.getEmail());
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            existingUser.setPassword(updatedUser.getPassword());
+        }
+        existingUser.setRole(updatedUser.getRole());
+
+        return userRepository.save(existingUser);
+    }
+
+    public boolean deleteUser(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        
+        // Impede a exclusão do usuário root
+        if ("root".equals(user.getUsername())) {
+            throw new RuntimeException("Não é possível excluir o usuário root");
+        }
+        
+        userRepository.deleteById(id);
+        return true;
+    }
+
+    public User authenticateUser(String username, String password) {
+        User user = userRepository.findByUsername(username);
+        if (user != null && user.getPassword().equals(password)) {
+            return user;
+        }
+        return null;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);

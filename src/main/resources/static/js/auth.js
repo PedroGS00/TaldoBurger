@@ -7,23 +7,23 @@ function renderHeader() {
     let headerContent = `<div class="container"><a href="index.html" class="logo">Taldo Burger</a><nav><ul>`;
 
     if (loggedInUser) {
-        // --- USUÁRIO LOGADO ---
         headerContent += `
             <li><a href="index.html">Início</a></li>
             <li><a href="cardapio.html">Cardápio</a></li>`;
 
-        // Se o email do usuário for o de admin, mostra o link especial
-        if (loggedInUser.email === 'admin@taldoburger.com') {
+        if (loggedInUser.role === 'ADMIN') {
             headerContent += `<li><a href="admin.html" style="color: var(--color-accent); font-weight: bold;">Admin</a></li>`;
         }
 
+        if (loggedInUser.role !== 'ADMIN') {
+            headerContent += `<li class="welcome-user">Olá, ${loggedInUser.name}</li>`;
+        }
+
         headerContent += `
-            <li class="welcome-user">Olá, ${loggedInUser.name}</li>
             <li><a href="#" id="logout-link" class="logout-link">Sair</a></li>
             <li><a href="carrinho.html" class="cart-icon"><i class="fas fa-shopping-cart"></i><span id="cart-counter" class="cart-counter">0</span></a></li>`;
 
     } else {
-        // --- USUÁRIO DESLOGADO ---
         headerContent += `
             <li><a href="index.html">Início</a></li>
             <li><a href="cardapio.html">Cardápio</a></li>

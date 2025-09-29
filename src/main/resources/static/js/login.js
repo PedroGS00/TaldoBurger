@@ -1,18 +1,42 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('login-form');
     const errorMessage = document.getElementById('error-message');
-    form.addEventListener('submit', (e) => {
+    
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorMessage.textContent = '';
-        const email = document.getElementById('email').value;
+        
+        const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        const user = users.find(u => u.email === email && u.password === password);
-        if (user) {
-            sessionStorage.setItem('loggedInUser', JSON.stringify(user));
-            window.location.href = 'cardapio.html';
-        } else {
-            errorMessage.textContent = 'Email ou senha inválidos.';
+        
+        try {
+            const response = await fetch('http://localhost:8080/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                }),
+            });
+
+            if (response.status === 200) {
+                const user = await response.json();
+                sessionStorage.setItem('loggedInUser', JSON.stringify(user));
+                
+                if (user.role === 'ADMIN') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'cardapio.html';
+                }
+            } else if (response.status === 401) {
+                errorMessage.textContent = 'Username ou senha inválidos.';
+            } else {
+                errorMessage.textContent = 'Ocorreu um erro ao tentar fazer login.';
+            }
+        } catch (error) {
+            errorMessage.textContent = 'Não foi possível conectar ao servidor. Tente novamente mais tarde.';
         }
     });
 });

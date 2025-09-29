@@ -25,18 +25,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        // --- Linha corrigida ---
-                        .requestMatchers(
-                                "/cadastro.html", // Permite acesso à página de cadastro
-                                "/login.html",    // Permite acesso à página de login
-                                "/css/**",        // Permite acesso a todos os arquivos na pasta css
-                                "/js/**",         // Permite acesso a todos os arquivos na pasta js
-                                "/users/registro" // Permite acesso à API de registro
-                        ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // Permite acesso a todas as rotas sem autenticação
                 )
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(AbstractHttpConfigurer::disable) // Desabilita autenticação HTTP Basic
+                .formLogin(AbstractHttpConfigurer::disable); // Desabilita form login
         return http.build();
     }
 }
