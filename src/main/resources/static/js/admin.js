@@ -21,6 +21,30 @@ document.addEventListener('DOMContentLoaded', () => {
     let products = JSON.parse(localStorage.getItem('products')) || [];
     let users = [];
 
+    function loadProducts() {
+        products = JSON.parse(localStorage.getItem('products')) || [];
+        if (products.length === 0) {
+            products = [
+                {id: 1, name: "Classic Burger", description: "Pão, carne 150g, queijo, alface, tomate e nosso molho especial.", price: 25.00, estoque: 50, imageUrl: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=2072&auto=format&fit=crop"},
+                {id: 2, name: "Bacon Paradise", description: "Pão, carne 180g, dobro de bacon, queijo cheddar e molho barbecue.", price: 32.50, estoque: 30, imageUrl: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?q=80&w=2070&auto=format&fit=crop"},
+                {id: 3, name: "Veggie Dream", description: "Pão integral, burger de grão de bico, queijo vegano e salada fresca.", price: 28.00, estoque: 25, imageUrl: "https://plus.unsplash.com/premium_photo-1675345026943-416a2a754117?q=80&w=2070&auto=format&fit=crop"},
+                {id: 4, name: "Double Trouble", description: "Pão, duas carnes de 150g, dobro de queijo, picles e cebola roxa.", price: 38.00, estoque: 20, imageUrl: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=2070&auto=format&fit=crop"},
+                {id: 5, name: "Spicy Jalapeño", description: "Pão, carne 180g, queijo pepper jack, pimentas jalapeño e maionese picante.", price: 33.00, estoque: 35, imageUrl: "https://images.unsplash.com/photo-1603614533240-36a1b7e4115c?q=80&w=1925&auto=format&fit=crop"},
+                {id: 6, name: "Chicken Crispy", description: "Pão, filé de frango empanado, alface americana e maionese de ervas.", price: 29.50, estoque: 40, imageUrl: "https://images.unsplash.com/photo-1604391215783-659779339d7b?q=80&w=1974&auto=format&fit=crop"},
+                {id: 7, name: "Onion Rings Tower", description: "Pão, carne 180g, queijo suíço, anéis de cebola e molho especial.", price: 34.00, estoque: 25, imageUrl: "https://images.unsplash.com/photo-1598642792341-4292150f2245?q=80&w=1974&auto=format&fit=crop"},
+                {id: 8, name: "Mushroom Melt", description: "Pão brioche, carne 180g, cogumelos salteados e queijo provolone.", price: 35.50, estoque: 30, imageUrl: "https://images.unsplash.com/photo-1551615593-ef5fe247e8f7?q=80&w=2070&auto=format&fit=crop"},
+                {id: 9, name: "Taldo's Special", description: "Pão australiano, carne 200g, costela desfiada e queijo gouda.", price: 42.00, estoque: 15, imageUrl: "https://images.unsplash.com/photo-1605789535382-72a3d3a015a9?q=80&w=2070&auto=format&fit=crop"},
+                {id: 10, name: "Kids Burger", description: "Pão, carne 90g e queijo. Simples e delicioso para os pequenos.", price: 18.00, estoque: 60, imageUrl: "https://images.unsplash.com/photo-1549611016-3a70d82b5040?q=80&w=2070&auto=format&fit=crop"}
+            ];
+            saveProducts();
+        }
+        renderProducts();
+    }
+
+    function saveProducts() {
+        localStorage.setItem('products', JSON.stringify(products));
+    }
+
     async function loadUsers() {
         try {
             const response = await fetch('http://localhost:8080/users');
@@ -33,14 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Erro ao conectar com a API:', error);
         }
-    }
-
-    function saveProducts() {
-        localStorage.setItem('products', JSON.stringify(products));
-    }
-
-    function saveUsers() {
-        localStorage.setItem('users', JSON.stringify(users));
     }
 
     function renderProducts() {
@@ -130,21 +146,30 @@ document.addEventListener('DOMContentLoaded', () => {
     productForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const id = parseInt(productIdInput.value);
-        const newProductData = {
-            id: id || Date.now(),
+        const productData = {
             name: document.getElementById('name').value,
             description: document.getElementById('description').value,
             price: parseFloat(document.getElementById('price').value),
-            imageUrl: document.getElementById('imageUrl').value,
+            estoque: parseInt(document.getElementById('stock').value) || 0,
+            imageUrl: document.getElementById('imageUrl').value || 'https://via.placeholder.com/300x200?text=Sem+Imagem'
         };
+
         if (id) {
-            products = products.map(p => p.id === id ? newProductData : p);
+            // Atualizar produto existente
+            const index = products.findIndex(p => p.id === id);
+            if (index !== -1) {
+                products[index] = { ...products[index], ...productData };
+            }
         } else {
-            products.push(newProductData);
+            // Criar novo produto
+            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+            products.push({ id: newId, ...productData });
         }
+
         saveProducts();
         renderProducts();
         resetForm();
+        alert(id ? 'Produto atualizado com sucesso!' : 'Produto criado com sucesso!');
     });
 
     productTableBody.addEventListener('click', (e) => {
@@ -154,9 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (target.classList.contains('product-delete-btn')) {
             if (confirm('Tem certeza que deseja excluir este item do cardápio?')) {
-                products = products.filter(p => p.id !== id);
-                saveProducts();
-                renderProducts();
+                const index = products.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    products.splice(index, 1);
+                    saveProducts();
+                    renderProducts();
+                    alert('Produto excluído com sucesso!');
+                }
             }
         }
         if (target.classList.contains('edit-btn')) {
@@ -166,7 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('name').value = product.name;
                 document.getElementById('description').value = product.description;
                 document.getElementById('price').value = product.price;
-                document.getElementById('imageUrl').value = product.imageUrl;
+                document.getElementById('stock').value = product.estoque || 0;
+                document.getElementById('imageUrl').value = product.imageUrl || '';
                 formTitle.textContent = 'Editar Lanche';
                 cancelBtn.style.display = 'inline-block';
                 window.scrollTo(0, 0);
@@ -260,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (error) {
                     alert('Erro ao conectar com o servidor: ' + error.message);
-                    target.value = userToUpdate.role; /
+                    target.value = userToUpdate.role; 
                 }
             }
         }
@@ -283,6 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cancelBtn.addEventListener('click', resetForm);
     userCancelBtn.addEventListener('click', resetUserForm);
-    renderProducts();
+    loadProducts();
     loadUsers();
 });
