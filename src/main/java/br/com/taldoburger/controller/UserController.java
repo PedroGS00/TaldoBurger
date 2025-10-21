@@ -1,5 +1,6 @@
 package br.com.taldoburger.controller;
 
+import br.com.taldoburger.dto.*;
 import br.com.taldoburger.model.User;
 import br.com.taldoburger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,8 @@ public class UserController {
     private UserService userService;
 
     @PostMapping ("/registro")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        User registeredUser = userService.registerUser(user);
+    public ResponseEntity<User> registerUser(@RequestBody UserRequestDTO userDTO) {
+        User registeredUser = userService.registerUser(userDTO);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
 
@@ -33,8 +34,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<UserResponseDTO> users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 

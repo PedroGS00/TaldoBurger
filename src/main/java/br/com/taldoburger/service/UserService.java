@@ -1,6 +1,8 @@
 package br.com.taldoburger.service;
 
+import br.com.taldoburger.dto.*;
 import br.com.taldoburger.model.User;
+import java.util.stream.Collectors;
 import br.com.taldoburger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,15 +21,28 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    public User registerUser(User user) {
-        if (user.getRole() == null) {
-            user.setRole(User.UserRole.USER);
+    public User registerUser(UserRequestDTO userDTO) {
+        if(userDTO.password() == null) {
+            throw new IllegalAccessError("Senha não pode ser nula");
         }
-        return userRepository.save(user);
+
+        User user = new User();
+        user.setName(userDTO.name());
+        user.setUsername(userDTO.username());
+        user.setEmail(userDTO.email());
+        user.setPassword(userDTO.password());
+        user.setRole(User.UserRole.USER);
+        
+        User savedUser = userRepository.save(user);
+
+        return savedUser;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> new UserResponseDTO(user)) 
+                .collect(Collectors.toList()); 
     }
 
     public User createUser(User user) {
