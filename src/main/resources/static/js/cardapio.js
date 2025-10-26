@@ -2,10 +2,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuGrid = document.querySelector('.menu-grid');
     const successMessageDiv = document.getElementById('success-message');
     let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+    let products = [];
 
-    function renderMenu() {
-        let products = JSON.parse(localStorage.getItem('products')) || [];
+    async function loadProducts() {
+        try {
+            const response = await fetch('http://localhost:8080/lanches');
+            if (response.ok) {
+                products = await response.json();
+                // Mapear os dados da API para o formato esperado pelo frontend
+                products = products.map(lanche => ({
+                    id: lanche.id,
+                    name: lanche.nome,
+                    description: lanche.descricao,
+                    price: lanche.preco,
+                    imagePath: lanche.imagePath
+                }));
+                renderMenu(); // Renderizar o menu após carregar os produtos
+            } else {
+                console.error('Erro ao carregar produtos da API');
+                // Fallback para dados locais se a API falhar
+                loadLocalProducts();
+            }
+        } catch (error) {
+            console.error('Erro ao conectar com a API:', error);
+            // Fallback para dados locais se a API falhar
+            loadLocalProducts();
+        }
+    }
 
+    function loadLocalProducts() {
+        products = JSON.parse(localStorage.getItem('products')) || [];
         if (products.length === 0) {
             products = [
                 {id: 1, name: "Classic Burger", description: "Pão, carne 150g, queijo, alface, tomate e nosso molho especial.", price: 25.00, imageUrl: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=2072&auto=format&fit=crop"},
@@ -21,13 +47,16 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
             localStorage.setItem('products', JSON.stringify(products));
         }
+    }
 
+    function renderMenu() {
         menuGrid.innerHTML = '';
         products.forEach(product => {
             const menuItem = document.createElement('div');
             menuItem.classList.add('menu-item');
+            const imageSrc = product.imagePath ? `/img/${product.imagePath}` : (product.imageUrl || '/img/placeholder.jpg');
             menuItem.innerHTML = `
-                <img src="${product.imageUrl}" alt="${product.name}">
+                <img src="${imageSrc}" alt="${product.name}">
                 <h3>${product.name}</h3>
                 <p>${product.description}</p>
                 <span class="price">R$ ${product.price.toFixed(2)}</span>
@@ -56,14 +85,16 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`${name} foi adicionado ao carrinho!`);
     }
 
-    menuGrid.addEventListener('click', (event) => {
-        if (event.target.classList.contains('add-to-cart-btn')) {
-            adicionarAoCarrinho(
-                event.target.dataset.name,
-                parseFloat(event.target.dataset.price)
-            );
-        }
-    });
+    if (menuGrid) {
+        menuGrid.addEventListener('click', (event) => {
+            if (event.target.classList.contains('add-to-cart-btn')) {
+                adicionarAoCarrinho(
+                    event.target.dataset.name,
+                    parseFloat(event.target.dataset.price)
+                );
+            }
+        });
+    }
 
     if (sessionStorage.getItem('compraFinalizada') === 'true') {
         successMessageDiv.textContent = 'Compra finalizada com sucesso! Peça novamente:';
@@ -74,5 +105,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    renderMenu();
+    loadProducts();
 });

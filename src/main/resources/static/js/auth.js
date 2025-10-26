@@ -4,7 +4,7 @@ function renderHeader() {
 
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
 
-    let headerContent = `<div class="container"><a href="index.html" class="logo">Taldo Burger</a><nav><ul>`;
+    let headerContent = `<div class="container"><a href="index.html" class="logo"><img src="img/logo.png" alt="Taldo Burger Logo" style="height: 3.5rem; margin-right: 15px; vertical-align: middle;">Taldo Burger</a><nav><ul>`;
 
     if (loggedInUser) {
         headerContent += `

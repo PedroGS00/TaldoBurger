@@ -143,33 +143,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    productForm.addEventListener('submit', (e) => {
+    productForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = parseInt(productIdInput.value);
-        const productData = {
-            name: document.getElementById('name').value,
-            description: document.getElementById('description').value,
-            price: parseFloat(document.getElementById('price').value),
-            estoque: parseInt(document.getElementById('stock').value) || 0,
-            imageUrl: document.getElementById('imageUrl').value || 'https://via.placeholder.com/300x200?text=Sem+Imagem'
-        };
-
-        if (id) {
-            // Atualizar produto existente
-            const index = products.findIndex(p => p.id === id);
-            if (index !== -1) {
-                products[index] = { ...products[index], ...productData };
-            }
-        } else {
-            // Criar novo produto
-            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-            products.push({ id: newId, ...productData });
+        
+        const formData = new FormData();
+        formData.append('nome', document.getElementById('name').value);
+        formData.append('descricao', document.getElementById('description').value);
+        formData.append('preco', parseFloat(document.getElementById('price').value));
+        formData.append('estoque', parseInt(document.getElementById('stock').value) || 0);
+        
+        const fileInput = document.getElementById('imageFile');
+        if (fileInput.files[0]) {
+            formData.append('file', fileInput.files[0]);
         }
 
-        saveProducts();
-        renderProducts();
-        resetForm();
-        alert(id ? 'Produto atualizado com sucesso!' : 'Produto criado com sucesso!');
+        try {
+            const response = await fetch('http://localhost:8080/lanches', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const newLanche = await response.json();
+                alert('Lanche criado com sucesso!');
+                resetForm();
+                loadLanches(); // Função para recarregar a lista de lanches
+            } else {
+                const errorText = await response.text();
+                alert('Erro ao salvar lanche: ' + errorText);
+            }
+        } catch (error) {
+            alert('Erro ao conectar com o servidor: ' + error.message);
+        }
     });
 
     productTableBody.addEventListener('click', (e) => {
@@ -196,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('description').value = product.description;
                 document.getElementById('price').value = product.price;
                 document.getElementById('stock').value = product.estoque || 0;
-                document.getElementById('imageUrl').value = product.imageUrl || '';
+                document.getElementById('imageFile').value = ''; // Limpar o campo de arquivo
                 formTitle.textContent = 'Editar Lanche';
                 cancelBtn.style.display = 'inline-block';
                 window.scrollTo(0, 0);
@@ -313,6 +319,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cancelBtn.addEventListener('click', resetForm);
     userCancelBtn.addEventListener('click', resetUserForm);
+    async function loadLanches() {
+        try {
+            const response = await fetch('http://localhost:8080/lanches');
+            if (response.ok) {
+                const lanches = await response.json();
+                products = lanches.map(lanche => ({
+                    id: lanche.id,
+                    name: lanche.nome,
+                    description: lanche.descricao,
+                    price: lanche.preco,
+                    estoque: lanche.estoque,
+                    imagePath: lanche.imagePath
+                }));
+                renderProducts();
+            } else {
+                console.error('Erro ao carregar lanches');
+            }
+        } catch (error) {
+            console.error('Erro ao conectar com o servidor:', error);
+        }
+    }
+
     loadProducts();
     loadUsers();
+    loadLanches(); // Carregar lanches da API
 });

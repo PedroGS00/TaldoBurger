@@ -1,13 +1,15 @@
 package br.com.taldoburger.controller;
 
+import br.com.taldoburger.dto.LancheResponseDTO; 
 import br.com.taldoburger.model.Lanche;
 import br.com.taldoburger.service.LancheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile; 
 import java.util.*;
+
 
 @RestController
 @RequestMapping("/lanches")
@@ -17,14 +19,19 @@ public class LancheController {
     private LancheService lancheService;
 
     @PostMapping
-    public ResponseEntity<Lanche> createLanche(@RequestBody Lanche lanche) {
-        Lanche newLanche = lancheService.saveLanche(lanche);
+    public ResponseEntity<LancheResponseDTO> createLanche(@RequestParam("file") MultipartFile file,
+            @RequestParam("nome") String nome,
+            @RequestParam("descricao") String descricao,
+            @RequestParam("preco") Double preco,
+            @RequestParam("estoque") Integer estoque) {
+
+        LancheResponseDTO newLanche = lancheService.saveImg(file, nome, descricao, preco, estoque);
         return new ResponseEntity<>(newLanche, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Lanche>> getAllLanches(){
-        List<Lanche> lanche = lancheService.findAllLanches();
+    public ResponseEntity<List<LancheResponseDTO>> getAllLanches(){
+        List<LancheResponseDTO> lanche = lancheService.findAllLanches();
         return new ResponseEntity<>(lanche, HttpStatus.OK);
     }
 
@@ -35,18 +42,17 @@ public class LancheController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Lanche> updateLanche(@PathVariable Long id, @RequestBody Lanche lanche) {
-        Optional<Lanche> existingLanche = lancheService.findLancheById(id);
-        if (existingLanche.isPresent()) {
-            Lanche lancheToUpdate = existingLanche.get();
-            lancheToUpdate.setNome(lanche.getNome());
-            lancheToUpdate.setDescricao(lanche.getDescricao());
-            lancheToUpdate.setPreco(lanche.getPreco());
-            lancheToUpdate.setEstoque(lanche.getEstoque());
-
-            Lanche updatedLanche = lancheService.saveLanche(lancheToUpdate);
+    public ResponseEntity<LancheResponseDTO> updateLanche(@PathVariable Long id, 
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam("nome") String nome,
+            @RequestParam("descricao") String descricao,
+            @RequestParam("preco") Double preco,
+            @RequestParam("estoque") Integer estoque) {
+        
+        try {
+            LancheResponseDTO updatedLanche = lancheService.updateLancheWithImage(id, file, nome, descricao, preco, estoque);
             return new ResponseEntity<>(updatedLanche, HttpStatus.OK);
-        } else {
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

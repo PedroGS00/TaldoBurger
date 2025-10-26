@@ -1,0 +1,15 @@
+-- Dados iniciais para lanches baseados nas imagens disponíveis
+INSERT INTO tb_lanches (nome, descricao, preco, estoque, image_path) VALUES
+('Taldo Bacon', 'Uma combinação imbatível. Pão macio abraçando um burger artesanal de 180g, 
+coberto por queijo cheddar cremoso e um generoso banho de molho barbecue. 
+O dobro de fatias de bacon premium, perfeitamente crocantes.', 18.90, 30, 'taldo_bacon.png'),
+('Taldo Cheddar', 'Uma explosão de sabor cheddar. Pão australiano macio, um suculento burger de 180g coberto por queijo cheddar, ainda mais cheddar derretido cremoso, bacon crocante defumado e a doçura da cebola caramelizada.', 16.90, 35, 'taldo_cheddar.png'),
+('Taldo Chicken', 'O clássico reinventado. Pão fresquinho abraçando um crocante filé de frango empanado, folhas frescas de alface americana e o toque refrescante da nossa maionese de ervas especial.', 17.50, 40, 'taldo_chicken.png'),
+('Taldo Classic', 'O clássico que nunca sai de moda. Pão brioche com gergelim, um suculento burger alto de 180g no ponto perfeito, queijo suíço derretido, folhas de alface americana, rodelas de tomate fresco e picles crocante.', 15.90, 50, 'taldo_classic.png'),
+('Taldo Cogu', 'Um toque sofisticado e terroso. Pão brioche macio envolvendo um burger de 180g no ponto certo, coberto por uma generosa porção de cogumelos salteados e queijo provolone derretido.', 19.90, 25, 'taldo_cogu.png'),
+('Taldo Double', 'Para os amantes de carne. Pão fresquinho abraçando duas suculentas carnes de 150g cada, dobro de queijo derretido, salada fresca, rodelas de tomate, picles crocante e a pungência da cebola roxa.', 22.90, 20, 'taldo_double.png'),
+('Taldo Jalapeño', 'Para quem gosta de um toque picante. Pão macio envolvendo um suculento burger de 180g, queijo pepper jack derretido, rodelas vibrantes de pimentas jalapeño e a cremosidade da nossa maionese picante.', 18.50, 30, 'taldo_jalapeño.png'),
+('Taldinho', 'Simplicidade e sabor garantidos para os pequenos. Pão macio abraçando um burger de 90g no ponto certo, coberto apenas com uma fatia de queijo derretido. Simples e delicioso!', 12.90, 45, 'taldo_kids.png'),
+('Taldo Onion', 'A combinação perfeita de crocância e sabor. Pão brioche macio, um suculento burger de 200g, queijo cheddar cremoso, anéis de cebola dourados e nosso molho especial. Finalizado com um tentador anel de cebola recheado de cheddar no topo!', 17.90, 35, 'taldo_onion.png'),
+('Taldão', 'A experiência premium da casa. Pão australiano levemente adocicado, um robusto burger de 300g, generosa porção de costela desfiada temperada e queijo gouda derretido.', 21.90, 25, 'taldo_special.png'),
+('Taldo Veggie', 'Uma opção leve e saborosa. Pão integral, um delicioso e nutritivo burger de grão de bico, queijo vegano derretido e a frescura de uma salada crocante.', 16.50, 30, 'taldo_veggie.png');

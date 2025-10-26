@@ -5,7 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function atualizarContador() {
         const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
         const totalItems = carrinho.reduce((sum, item) => sum + item.quantity, 0);
-        cartCounter.textContent = totalItems;
+        if (cartCounter) {
+            cartCounter.textContent = totalItems;
+        }
     }
 
     atualizarContador();

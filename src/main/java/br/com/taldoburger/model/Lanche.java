@@ -1,5 +1,6 @@
 package br.com.taldoburger.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,4 +27,7 @@ public class Lanche {
     private String descricao;
     private Double preco;
     private Integer estoque;
+    
+    @Column(name = "image_path")
+    private String imagePath;
 }
