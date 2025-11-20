@@ -250,29 +250,23 @@ document.addEventListener('DOMContentLoaded', () => {
     productForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = parseInt(productIdInput.value);
-        
         const formData = new FormData();
         formData.append('nome', document.getElementById('name').value);
         formData.append('descricao', document.getElementById('description').value);
         formData.append('preco', parseFloat(document.getElementById('price').value));
         formData.append('estoque', parseInt(document.getElementById('stock').value) || 0);
-        
         const fileInput = document.getElementById('imageFile');
         if (fileInput.files[0]) {
             formData.append('file', fileInput.files[0]);
         }
-
         try {
-            const response = await fetch('http://localhost:8080/lanches', {
-                method: 'POST',
-                body: formData
-            });
-
+            const url = id ? `http://localhost:8080/lanches/${id}` : 'http://localhost:8080/lanches';
+            const method = id ? 'PUT' : 'POST';
+            const response = await fetch(url, { method, body: formData });
             if (response.ok) {
-                const newLanche = await response.json();
-                notify({ title: 'Sucesso', message: 'Lanche criado com sucesso!', icon: 'fas fa-burger' });
+                notify({ title: 'Sucesso', message: id ? 'Lanche atualizado com sucesso!' : 'Lanche criado com sucesso!', icon: 'fas fa-burger' });
                 resetForm();
-                loadLanches(); // Função para recarregar a lista de lanches
+                loadLanches();
             } else {
                 const errorText = await response.text();
                 notify({ title: 'Erro ao salvar lanche', message: errorText, icon: 'fas fa-triangle-exclamation' });
@@ -289,19 +283,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (target.classList.contains('product-delete-btn')) {
             const ok = await confirmDialog({
-                title: 'Excluir produto',
+                title: 'Excluir lanche',
                 message: 'Tem certeza que deseja excluir este item do cardápio?',
                 icon: 'fas fa-trash-can',
                 confirmLabel: 'Excluir',
                 cancelLabel: 'Cancelar'
             });
             if (ok) {
-                const index = products.findIndex(p => p.id === id);
-                if (index !== -1) {
-                    products.splice(index, 1);
-                    saveProducts();
-                    renderProducts();
-                    notify({ title: 'Sucesso', message: 'Produto excluído com sucesso!', icon: 'fas fa-trash-can' });
+                try {
+                    const response = await fetch(`http://localhost:8080/lanches/${id}`, { method: 'DELETE' });
+                    if (response.ok || response.status === 204) {
+                        products = products.filter(p => p.id === undefined ? true : p.id !== id);
+                        renderProducts();
+                        notify({ title: 'Sucesso', message: 'Lanche excluído com sucesso!', icon: 'fas fa-trash-can' });
+                    } else {
+                        const errorText = await response.text();
+                        notify({ title: 'Erro ao excluir lanche', message: errorText, icon: 'fas fa-triangle-exclamation' });
+                    }
+                } catch (error) {
+                    notify({ title: 'Erro de conexão', message: error.message, icon: 'fas fa-wifi' });
                 }
             }
         }
