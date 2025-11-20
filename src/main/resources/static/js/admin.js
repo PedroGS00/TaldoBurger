@@ -11,10 +11,102 @@ document.addEventListener('DOMContentLoaded', () => {
     const userCancelBtn = document.getElementById('user-cancel-btn');
     const userFormTitle = document.getElementById('user-form-title');
 
+    function notify({ title = 'Aviso', message = '', icon = 'fas fa-info-circle', actionHref = null, actionLabel = null, autoSeconds = 0 }) {
+        const modal = document.createElement('div');
+        modal.className = 'confirm-modal show';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-hidden', 'false');
+        modal.innerHTML = `
+          <div class="confirm-backdrop" data-dismiss="admin-modal"></div>
+          <div class="confirm-card">
+            <div class="confirm-status"><div class="status-icon success"><i class="${icon}"></i></div></div>
+            <h3 class="confirm-title">${title}</h3>
+            <p class="confirm-message">${message}</p>
+            <div class="confirm-actions">${actionHref && actionLabel ? `<a class="btn" id="admin-modal-action" href="${actionHref}">${actionLabel}</a>` : ''}</div>
+            <p class="confirm-hint" id="admin-modal-hint"></p>
+            <button type="button" class="confirm-close" title="Fechar" data-dismiss="admin-modal"><i class="fas fa-times"></i></button>
+          </div>`;
+        document.body.appendChild(modal);
+        const dismissEls = modal.querySelectorAll('[data-dismiss="admin-modal"]');
+        dismissEls.forEach(el => el.addEventListener('click', () => {
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+            setTimeout(() => modal.remove(), 150);
+        }));
+        const actionBtn = document.getElementById('admin-modal-action');
+        if (actionBtn) {
+            actionBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('page-leave');
+                setTimeout(() => { window.location.href = actionHref; }, 180);
+            });
+        }
+        if (autoSeconds && autoSeconds > 0) {
+            const hint = document.getElementById('admin-modal-hint');
+            hint.textContent = `Você será redirecionado em ${autoSeconds}s.`;
+            const countdown = setInterval(() => {
+                autoSeconds--;
+                hint.textContent = `Você será redirecionado em ${autoSeconds}s.`;
+                if (autoSeconds <= 0) {
+                    clearInterval(countdown);
+                    document.body.classList.add('page-leave');
+                    setTimeout(() => { if (actionHref) window.location.href = actionHref; }, 180);
+                }
+            }, 1000);
+        }
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'Escape') {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+                setTimeout(() => modal.remove(), 150);
+            }
+        });
+        return modal;
+    }
+
+    function confirmDialog({ title = 'Confirmar ação', message = '', icon = 'fas fa-question-circle', confirmLabel = 'Confirmar', cancelLabel = 'Cancelar' }) {
+        return new Promise((resolve) => {
+            const modal = document.createElement('div');
+            modal.className = 'confirm-modal show';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-hidden', 'false');
+            modal.innerHTML = `
+              <div class="confirm-backdrop" data-dismiss="confirm-modal"></div>
+              <div class="confirm-card">
+                <div class="confirm-status"><div class="status-icon success"><i class="${icon}"></i></div></div>
+                <h3 class="confirm-title">${title}</h3>
+                <p class="confirm-message">${message}</p>
+                <div class="confirm-actions">
+                  <button class="btn" id="confirm-yes-btn">${confirmLabel}</button>
+                  <button class="btn btn-secondary" id="confirm-no-btn">${cancelLabel}</button>
+                </div>
+                <button type="button" class="confirm-close" title="Fechar" data-dismiss="confirm-modal"><i class="fas fa-times"></i></button>
+              </div>`;
+            document.body.appendChild(modal);
+
+            const cleanup = (result) => {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+                setTimeout(() => modal.remove(), 150);
+                resolve(result);
+            };
+            modal.querySelector('#confirm-yes-btn').addEventListener('click', () => cleanup(true));
+            modal.querySelector('#confirm-no-btn').addEventListener('click', () => cleanup(false));
+            modal.querySelectorAll('[data-dismiss="confirm-modal"]').forEach(el => el.addEventListener('click', () => cleanup(false)));
+            document.addEventListener('keyup', (e) => { if (e.key === 'Escape') cleanup(false); }, { once: true });
+        });
+    }
+
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (!loggedInUser || loggedInUser.role !== 'ADMIN') {
-        alert('Acesso negado. Esta área é apenas para administradores.');
-        window.location.href = 'index.html';
+        notify({
+            title: 'Acesso negado',
+            message: 'Esta área é apenas para administradores.',
+            icon: 'fas fa-circle-exclamation',
+            actionHref: 'index.html',
+            actionLabel: 'Ir para início',
+            autoSeconds: 4
+        });
         return;
     }
 
@@ -131,15 +223,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (response.ok) {
-                alert(id ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!');
+                notify({
+                    title: 'Sucesso',
+                    message: id ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!',
+                    icon: 'fas fa-user-check'
+                });
                 resetUserForm();
                 loadUsers(); // Recarrega a lista de usuários
             } else {
                 const errorText = await response.text();
-                alert('Erro ao salvar usuário: ' + errorText);
+                notify({
+                    title: 'Erro ao salvar usuário',
+                    message: errorText,
+                    icon: 'fas fa-triangle-exclamation'
+                });
             }
         } catch (error) {
-            alert('Erro ao conectar com o servidor: ' + error.message);
+            notify({
+                title: 'Erro de conexão',
+                message: error.message,
+                icon: 'fas fa-wifi'
+            });
         }
     });
 
@@ -166,31 +270,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const newLanche = await response.json();
-                alert('Lanche criado com sucesso!');
+                notify({ title: 'Sucesso', message: 'Lanche criado com sucesso!', icon: 'fas fa-burger' });
                 resetForm();
                 loadLanches(); // Função para recarregar a lista de lanches
             } else {
                 const errorText = await response.text();
-                alert('Erro ao salvar lanche: ' + errorText);
+                notify({ title: 'Erro ao salvar lanche', message: errorText, icon: 'fas fa-triangle-exclamation' });
             }
         } catch (error) {
-            alert('Erro ao conectar com o servidor: ' + error.message);
+            notify({ title: 'Erro de conexão', message: error.message, icon: 'fas fa-wifi' });
         }
     });
 
-    productTableBody.addEventListener('click', (e) => {
+    productTableBody.addEventListener('click', async (e) => {
         const target = e.target;
         if (!target.dataset.id) return;
         const id = parseInt(target.dataset.id);
 
         if (target.classList.contains('product-delete-btn')) {
-            if (confirm('Tem certeza que deseja excluir este item do cardápio?')) {
+            const ok = await confirmDialog({
+                title: 'Excluir produto',
+                message: 'Tem certeza que deseja excluir este item do cardápio?',
+                icon: 'fas fa-trash-can',
+                confirmLabel: 'Excluir',
+                cancelLabel: 'Cancelar'
+            });
+            if (ok) {
                 const index = products.findIndex(p => p.id === id);
                 if (index !== -1) {
                     products.splice(index, 1);
                     saveProducts();
                     renderProducts();
-                    alert('Produto excluído com sucesso!');
+                    notify({ title: 'Sucesso', message: 'Produto excluído com sucesso!', icon: 'fas fa-trash-can' });
                 }
             }
         }
@@ -218,24 +329,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.classList.contains('user-delete-btn')) {
             const userToDelete = users.find(u => u.id === id);
             if (userToDelete && userToDelete.username === loggedInUser.username) {
-                alert('Você não pode excluir sua própria conta de administrador.');
+                notify({ title: 'Ação não permitida', message: 'Você não pode excluir sua própria conta de administrador.', icon: 'fas fa-circle-exclamation' });
                 return;
             }
-            if (confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) {
+            const ok = await confirmDialog({
+                title: 'Excluir usuário',
+                message: 'Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.',
+                icon: 'fas fa-user-minus',
+                confirmLabel: 'Excluir',
+                cancelLabel: 'Cancelar'
+            });
+            if (ok) {
                 try {
                     const response = await fetch(`http://localhost:8080/users/${id}`, {
                         method: 'DELETE'
                     });
                     
                     if (response.ok) {
-                        alert('Usuário excluído com sucesso!');
+                        notify({ title: 'Sucesso', message: 'Usuário excluído com sucesso!', icon: 'fas fa-user-minus' });
                         loadUsers(); // Recarrega a lista
                     } else {
                         const errorText = await response.text();
-                        alert('Erro ao excluir usuário: ' + errorText);
+                        notify({ title: 'Erro ao excluir usuário', message: errorText, icon: 'fas fa-triangle-exclamation' });
                     }
                 } catch (error) {
-                    alert('Erro ao conectar com o servidor: ' + error.message);
+                    notify({ title: 'Erro de conexão', message: error.message, icon: 'fas fa-wifi' });
                 }
             }
         }
@@ -266,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const userToUpdate = users.find(u => u.id === id);
 
             if (userToUpdate && userToUpdate.username === 'root' && newRole === 'USER') {
-                 alert('Não é possível remover o cargo de Admin do usuário principal.');
+                 notify({ title: 'Ação não permitida', message: 'Não é possível remover o cargo de Admin do usuário principal.', icon: 'fas fa-circle-exclamation' });
                  target.value = 'ADMIN';
                  return;
             }
@@ -288,14 +406,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (response.ok) {
                         userToUpdate.role = newRole;
-                        alert('Cargo do usuário atualizado com sucesso!');
+                        notify({ title: 'Sucesso', message: 'Cargo do usuário atualizado com sucesso!', icon: 'fas fa-id-badge' });
                     } else {
                         const errorText = await response.text();
-                        alert('Erro ao atualizar cargo: ' + errorText);
+                        notify({ title: 'Erro ao atualizar cargo', message: errorText, icon: 'fas fa-triangle-exclamation' });
                         target.value = userToUpdate.role;
                     }
                 } catch (error) {
-                    alert('Erro ao conectar com o servidor: ' + error.message);
+                    notify({ title: 'Erro de conexão', message: error.message, icon: 'fas fa-wifi' });
                     target.value = userToUpdate.role; 
                 }
             }

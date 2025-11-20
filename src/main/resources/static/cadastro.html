@@ -45,6 +45,26 @@
     <p class="auth-switch">Já tem uma conta? <a href="login.html">Faça login</a></p>
     <p id="error-message" class="error-message"></p>
   </div>
+
+  <div id="register-modal" class="confirm-modal" aria-hidden="true" role="dialog" aria-labelledby="confirm-title" aria-modal="true">
+    <div class="confirm-backdrop" data-dismiss="register-modal"></div>
+    <div class="confirm-card">
+      <div class="confirm-status">
+        <div class="status-icon success" aria-hidden="true">
+          <i class="fas fa-check"></i>
+        </div>
+      </div>
+      <h3 id="confirm-title" class="confirm-title">Cadastro realizado!</h3>
+      <p id="confirm-message" class="confirm-message"></p>
+      <div class="confirm-actions">
+        <a id="go-login-btn" class="btn" href="login.html">Ir para login</a>
+      </div>
+      <p id="confirm-hint" class="confirm-hint"></p>
+      <button type="button" class="confirm-close" title="Fechar" data-dismiss="register-modal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
 </main>
 
 <footer class="footer">

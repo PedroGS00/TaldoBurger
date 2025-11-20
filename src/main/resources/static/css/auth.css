@@ -16,3 +16,48 @@
 .auth-switch { margin-top: 20px; }
 .auth-switch a { color: var(--color-primary); font-weight: bold; text-decoration: none; }
 .error-message { color: var(--color-secondary); margin-top: 15px; font-weight: bold; min-height: 20px; }
+
+.confirm-modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 2000; }
+.confirm-modal.show { display: flex; animation: fadeIn .25s ease both; }
+.confirm-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.45); backdrop-filter: blur(2px); }
+.confirm-card {
+    position: relative;
+    background: #fff;
+    width: min(520px, 92vw);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.20);
+    padding: 28px 28px 24px;
+    text-align: center;
+    animation: popUp .28s cubic-bezier(.2,.8,.2,1) both;
+}
+.confirm-status { display: flex; justify-content: center; margin-bottom: 14px; }
+.status-icon { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-size: 1.75rem; color: #fff; }
+.status-icon.success { background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); box-shadow: 0 8px 18px rgba(215, 105, 30, .35); }
+.confirm-title { font-family: var(--font-logo); color: var(--color-primary); font-size: 2rem; margin-bottom: 8px; }
+.confirm-message { font-size: 1rem; color: var(--color-text); margin-bottom: 18px; }
+.confirm-actions { display: flex; gap: 12px; justify-content: center; margin-top: 6px; }
+.confirm-hint { margin-top: 10px; font-size: .9rem; color: #666; }
+.confirm-close { position: absolute; right: 10px; top: 10px; background: transparent; border: none; color: #888; cursor: pointer; font-size: 1.15rem; transition: color .2s ease; }
+.confirm-close:hover { color: var(--color-primary); }
+
+.btn.loading { position: relative; color: transparent; }
+.btn.loading::after {
+    content: 'Cadastrando...';
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    color: #fff;
+}
+.btn.loading::before {
+    content: '';
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.6); border-top-color: #fff; border-radius: 50%;
+    animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popUp { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+@media (max-width: 480px) {
+    .confirm-card { padding: 22px 18px; }
+    .confirm-title { font-size: 1.6rem; }
+}
