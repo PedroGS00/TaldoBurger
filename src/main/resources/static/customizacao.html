@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalizar Pedido - Taldo Burger</title>
+  <link rel="icon" type="image/png" href="img/logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Lobster&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/customizacao.css">
+</head>
+<body>
+  <header class="header"></header>
+  <main>
+    <section class="custom-section">
+      <div class="container">
+        <h2>Personalize seu Pedido</h2>
+        <div id="pedido-base" class="pedido-base"></div>
+
+        <form id="form-customizacao" class="custom-form">
+          <fieldset>
+            <legend>Batata</legend>
+            <div class="field-row">
+              <label class="option-with-image">
+                <input type="radio" name="batata-tamanho" value="media">
+                <img src="img/batata_media.png" alt="Batata frita tamanho médio" loading="lazy" decoding="async" onerror="this.src='img/logo.png'; this.alt='Imagem não disponível';">
+                <span class="option-text">Média (R$ 8,00)</span>
+                <button type="button" class="remove-batata" aria-label="Remover batata"><i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+              </label>
+              <label class="option-with-image">
+                <input type="radio" name="batata-tamanho" value="grande">
+                <img src="img/batata_grande.png" alt="Batata frita tamanho grande" loading="lazy" decoding="async" onerror="this.src='img/logo.png'; this.alt='Imagem não disponível';">
+                <span class="option-text">Grande (R$ 12,00)</span>
+                <button type="button" class="remove-batata" aria-label="Remover batata"><i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+              </label>
+            </div>
+            <div class="feedback" id="batata-feedback" aria-live="polite" aria-atomic="true"></div>
+            <div class="field-row">
+              <label class="option-toggle"><input type="checkbox" id="batata-cheddar"><span class="option-name">Cheddar (+ R$ 3,00)</span></label>
+              <label class="option-toggle"><input type="checkbox" id="batata-bacon"><span class="option-name">Bacon (+ R$ 4,00)</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Bebidas</legend>
+            <div class="grid-products" id="bebidas-grid">
+              <button type="button" class="product-card refri-card" data-refri="Coca-Cola" aria-label="Selecionar Coca-Cola" role="button" tabindex="0">
+                <img src="https://andinacocacola.vtexassets.com/arquivos/ids/159186/44.jpg?v=638975402691170000" alt="Refrigerante Coca-Cola lata" loading="lazy" decoding="async" fetchpriority="high" width="120" height="120">
+                <span class="product-name">Coca-Cola</span>
+                <span class="product-price">R$ 6,00</span>
+              </button>
+              <button type="button" class="product-card refri-card" data-refri="Coca-Cola Zero" aria-label="Selecionar Coca-Cola Zero" role="button" tabindex="0">
+                <img src="https://coopsp.vtexassets.com/arquivos/ids/249047/55573.png?v=638937351715370000" alt="Refrigerante Coca-Cola Zero lata" loading="lazy" decoding="async" fetchpriority="high" width="120" height="120">
+                <span class="product-name">Coca-Cola Zero</span>
+                <span class="product-price">R$ 6,00</span>
+              </button>
+              <button type="button" class="product-card refri-card" data-refri="Guaraná Antarctica" aria-label="Selecionar Guaraná Antarctica" role="button" tabindex="0">
+                <img src="https://choppbrahmaexpress.vtexassets.com/arquivos/ids/158480/2f1a8384be47da2c12d08fd6bae7c689.png?v=638854247184600000" alt="Refrigerante Guaraná Antarctica lata" loading="lazy" decoding="async" width="120" height="120">
+                <span class="product-name">Guaraná Antarctica</span>
+                <span class="product-price">R$ 6,00</span>
+              </button>
+              <button type="button" class="product-card refri-card" data-refri="Fanta Laranja" aria-label="Selecionar Fanta Laranja" role="button" tabindex="0">
+                <img src="https://www.piramidesdistribuidora.com.br/images/original/3708-fanta-laranja-lata-350ml-normal-12un.20251024104230.png" alt="Refrigerante Fanta Laranja lata" loading="lazy" decoding="async" width="120" height="120">
+                <span class="product-name">Fanta Laranja</span>
+                <span class="product-price">R$ 6,00</span>
+              </button>
+              <button type="button" class="product-card refri-card" data-refri="Fanta Uva" aria-label="Selecionar Fanta Uva" role="button" tabindex="0">
+                <img src="https://www.piramidesdistribuidora.com.br/images/products/3734-fanta-uva-lata-350ml-6un.20251024104230.png" alt="Refrigerante Fanta Uva lata" loading="lazy" decoding="async" width="120" height="120">
+                <span class="product-name">Fanta Uva</span>
+                <span class="product-price">R$ 6,00</span>
+              </button>
+              <button type="button" class="product-card refri-card" data-refri="Sprite" aria-label="Selecionar Sprite" role="button" tabindex="0">
+                <img src="https://www.extramercado.com.br/img/uploads/1/208/33225208.png" alt="Refrigerante Sprite lata" loading="lazy" decoding="async" width="120" height="120">
+                <span class="product-name">Sprite</span>
+                <span class="product-price">R$ 6,00</span>
+              </button>
+              <button type="button" class="product-card refri-card" data-refri="Água com gás" aria-label="Selecionar Água com gás" role="button" tabindex="0">
+                <img src="https://coopsp.vtexassets.com/arquivos/ids/249370-300-300?v=638960628217870000&width=300&height=300&aspect=true" alt="Água com gás garrafa" loading="lazy" decoding="async" width="120" height="120">
+                <span class="product-name">Água com gás</span>
+                <span class="product-price">R$ 6,00</span>
+              </button>
+              <button type="button" class="product-card refri-card" data-refri="Água sem gás" aria-label="Selecionar Água sem gás" role="button" tabindex="0">
+                <img src="https://assets.jokrtech.com/small_PROD_530001_P1_d6d33b9793.png" alt="Água sem gás garrafa" loading="lazy" decoding="async" width="120" height="120">
+                <span class="product-name">Água sem gás</span>
+                <span class="product-price">R$ 6,00</span>
+              </button>
+            </div>
+            <div class="feedback" id="refrigerante-feedback" aria-live="polite" aria-atomic="true"></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Sobremesas</legend>
+            <div class="grid-products" id="sobremesas-grid">
+              <button type="button" class="product-card dessert-card" data-dessert="Sorvete" aria-label="Selecionar Sorvete" role="button" tabindex="0">
+                <img src="img/taldo_sorvete.png" alt="Sorvete Taldo Burger" loading="lazy" decoding="async" width="120" height="120">
+                <span class="product-name">Sorvete</span>
+                <label class="checkbox-control"><input type="checkbox"> Adicionar</label>
+                <span class="product-price">R$ 10,00</span>
+              </button>
+              <button type="button" class="product-card dessert-card" data-dessert="Milkshake" aria-label="Selecionar Milkshake" role="button" tabindex="0">
+                <img src="img/taldo_milkshake.png" alt="Milkshake Taldo Burger" loading="lazy" decoding="async" width="120" height="120">
+                <span class="product-name">Milkshake</span>
+                <label class="checkbox-control"><input type="checkbox"> Adicionar</label>
+                <span class="product-price">R$ 12,00</span>
+              </button>
+              <button type="button" class="product-card dessert-card" data-dessert="Brownie" aria-label="Selecionar Brownie" role="button" tabindex="0">
+                <img src="img/taldo_brownie.png" alt="Brownie Taldo Burger" loading="lazy" decoding="async" width="120" height="120">
+                <span class="product-name">Brownie</span>
+                <label class="checkbox-control"><input type="checkbox"> Adicionar</label>
+                <span class="product-price">R$ 12,00</span>
+              </button>
+            </div>
+          </fieldset>
+
+          <div class="resumo">
+            <h3>Resumo Parcial</h3>
+            <ul id="resumo-parcial"></ul>
+            <div class="total">Subtotal: <strong id="subtotal">R$ 0,00</strong></div>
+          </div>
+
+          <div class="actions">
+            <a href="cardapio.html" class="btn" id="cancelar">Cancelar</a>
+            <button type="submit" class="btn">Prosseguir</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container"><p>&copy; 2025 Taldo Burger. Todos os direitos reservados.</p></div></footer>
+  <script src="js/auth.js"></script>
+  <script src="js/customizacao.js"></script>
+</body>
+</html>

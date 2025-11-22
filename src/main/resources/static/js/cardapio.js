@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3>${product.name}</h3>
                 <p>${product.description}</p>
                 <span class="price">R$ ${product.price.toFixed(2)}</span>
-                <button class="add-to-cart-btn" data-name="${product.name}" data-price="${product.price}">Adicionar</button>
+                <button class="add-to-cart-btn" data-name="${product.name}" data-price="${product.price}">Personalizar</button>
             `;
             menuGrid.appendChild(menuItem);
         });
@@ -71,24 +71,49 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.renderHeader) renderHeader();
     }
 
-    function adicionarAoCarrinho(name, price) {
+    function iniciarPersonalizacao(name, price) {
         const loggedInUser = sessionStorage.getItem('loggedInUser');
         if (!loggedInUser) {
-            alert('Você precisa fazer login para adicionar itens ao carrinho.');
-            window.location.href = 'login.html';
+            const modal = document.createElement('div');
+            modal.className = 'confirm-modal show';
+            modal.setAttribute('aria-hidden', 'false');
+            modal.setAttribute('role', 'dialog');
+            modal.innerHTML = `
+              <div class="confirm-backdrop" data-dismiss="login-required"></div>
+              <div class="confirm-card">
+                <div class="confirm-status"><div class="status-icon success"><i class="fas fa-user-lock"></i></div></div>
+                <h3 class="confirm-title">Faça login para continuar</h3>
+                <p class="confirm-message">Você precisa estar logado para personalizar seu pedido.</p>
+                <div class="confirm-actions"><a class="btn" id="go-login-btn" href="login.html">Ir para login</a></div>
+                <button type="button" class="confirm-close" title="Fechar" data-dismiss="login-required"><i class="fas fa-times"></i></button>
+              </div>`;
+            document.body.appendChild(modal);
+            const dismissEls = modal.querySelectorAll('[data-dismiss="login-required"]');
+            dismissEls.forEach(el => el.addEventListener('click', () => {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+                setTimeout(() => modal.remove(), 150);
+            }));
+            const goBtn = document.getElementById('go-login-btn');
+            if (goBtn) {
+                goBtn.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    document.body.classList.add('page-leave');
+                    setTimeout(() => { window.location.href = 'login.html'; }, 180);
+                });
+            }
             return;
         }
-        const itemExistente = carrinho.find(item => item.name === name);
-        if (itemExistente) itemExistente.quantity++;
-        else carrinho.push({ name, price, quantity: 1 });
-        salvarCarrinho();
-        alert(`${name} foi adicionado ao carrinho!`);
+        const base = { name, price };
+        sessionStorage.setItem('customLanche', JSON.stringify(base));
+        document.body.classList.add('page-leave');
+        setTimeout(() => { window.location.href = 'customizacao.html'; }, 180);
     }
 
     if (menuGrid) {
         menuGrid.addEventListener('click', (event) => {
             if (event.target.classList.contains('add-to-cart-btn')) {
-                adicionarAoCarrinho(
+                iniciarPersonalizacao(
                     event.target.dataset.name,
                     parseFloat(event.target.dataset.price)
                 );

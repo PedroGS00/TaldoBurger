@@ -1,0 +1,10 @@
+.resumo-section { padding: 40px 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.card { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 16px; box-shadow: 0 6px 16px rgba(0,0,0,.06); }
+.card h3 { color: var(--color-primary); margin-bottom: 8px; }
+#lista-itens { list-style: none; }
+#lista-itens li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #eee; }
+.final-form .opt { display: block; margin: 8px 0; }
+.totais { margin-top: 10px; }
+.actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 12px; }
+@media (max-width: 860px) { .cards { grid-template-columns: 1fr; } .actions { justify-content: center; } }
