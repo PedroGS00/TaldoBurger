@@ -55,6 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
     sobremesas: [],
     subtotal: 0
   };
+  state.lanche = { name: base.name, price: base.price };
+  sessionStorage.setItem('pedidoPersonalizado', JSON.stringify(state));
 
   function renderBaseInfo() {
     const LANCHES_INFO = {
@@ -266,9 +268,9 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', (ev) => {
     ev.preventDefault();
     const erros = [];
-    // Batata é opcional; não exigir seleção
-    if (!state.refrigerante.tipo) erros.push('Selecione o tipo de refrigerante.');
-    
+    if (!state.lanche || !state.lanche.name || typeof state.lanche.price !== 'number') {
+      erros.push('Selecione um lanche válido.');
+    }
     if (erros.length) { alert(erros.join('\n')); return; }
     document.body.classList.add('page-leave');
     setTimeout(() => { window.location.href = 'resumo.html'; }, 180);

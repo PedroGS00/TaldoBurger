@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const base = { name, price };
+        sessionStorage.removeItem('pedidoPersonalizado');
         sessionStorage.setItem('customLanche', JSON.stringify(base));
         document.body.classList.add('page-leave');
         setTimeout(() => { window.location.href = 'customizacao.html'; }, 180);
@@ -112,10 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (menuGrid) {
         menuGrid.addEventListener('click', (event) => {
-            if (event.target.classList.contains('add-to-cart-btn')) {
+            const btn = event.target.closest('.add-to-cart-btn');
+            if (btn) {
                 iniciarPersonalizacao(
-                    event.target.dataset.name,
-                    parseFloat(event.target.dataset.price)
+                    btn.dataset.name,
+                    parseFloat(btn.dataset.price)
                 );
             }
         });

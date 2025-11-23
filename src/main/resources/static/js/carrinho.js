@@ -53,9 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Seu carrinho está vazio!');
             return;
         }
-        localStorage.removeItem('carrinho');
-        sessionStorage.setItem('compraFinalizada', 'true');
-        window.location.href = 'cardapio.html';
+        sessionStorage.setItem('checkoutFromCart', 'true');
+        document.body.classList.add('page-leave');
+        setTimeout(() => { window.location.href = 'resumo.html'; }, 180);
     });
     renderizarCarrinho();
 });
