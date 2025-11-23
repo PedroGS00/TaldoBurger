@@ -147,9 +147,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ev.target.name === 'finalizacao') { opcao = ev.target.value; recalcularTotais(); }
   });
 
-  form.addEventListener('submit', (ev) => {
+  form.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     if (!opcao) { alert('Selecione uma opção de finalização.'); return; }
+    const submitBtn = form.querySelector('.btn[type="submit"]') || form.querySelector('.btn');
+    if (submitBtn) { submitBtn.classList.add('loading'); submitBtn.setAttribute('disabled', 'true'); }
     const { subtotal, total } = recalcularTotais();
     const pedidoFinal = {
       ...state,
@@ -157,7 +159,20 @@ document.addEventListener('DOMContentLoaded', () => {
       cupom: opcao === 'cupom' ? { codigo: gerarCodigoCupom() } : null
     };
     sessionStorage.setItem('pedidoFinal', JSON.stringify(pedidoFinal));
+    const loggedUser = JSON.parse(sessionStorage.getItem('loggedInUser')) || {};
+    const payload = {
+      username: loggedUser.username || null,
+      name: loggedUser.name || null,
+      pedido: pedidoFinal
+    };
+    const prevCarrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
     try {
+      const resp = await fetch('http://localhost:8080/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) throw new Error('Falha ao processar pedido');
       const partes = [];
       partes.push(state.lanche.name);
       if (state.batata.tamanho) partes.push(`Batata ${state.batata.tamanho}`);
@@ -168,10 +183,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const existente = carrinho.find(i => i.name === nomeItem && i.price === total);
       if (existente) existente.quantity += 1; else carrinho.push({ name: nomeItem, price: total, quantity: 1 });
       localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      localStorage.removeItem('carrinho');
       if (window.renderHeader) renderHeader();
-    } catch {}
-    document.body.classList.add('page-leave');
-    setTimeout(() => { window.location.href = 'confirmacao.html'; }, 180);
+      showModal({ title: 'Pedido confirmado', message: 'Seu pedido foi finalizado com sucesso!', icon: 'fas fa-check-circle' });
+      setTimeout(() => {
+        document.body.classList.add('page-leave');
+        setTimeout(() => { window.location.href = 'confirmacao.html'; }, 200);
+      }, 800);
+    } catch (err) {
+      localStorage.setItem('carrinho', JSON.stringify(prevCarrinho));
+      showModal({ title: 'Falha na finalização', message: 'Não foi possível concluir seu pedido. Tente novamente.', icon: 'fas fa-triangle-exclamation' });
+      if (submitBtn) { submitBtn.classList.remove('loading'); submitBtn.removeAttribute('disabled'); }
+    }
   });
 
   function gerarCodigoCupom() {

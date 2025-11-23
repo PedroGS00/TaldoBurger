@@ -12,3 +12,18 @@
 .btn.loading::after { content: ""; position: absolute; right: 12px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; }
 .fly-to-cart { position: fixed; width: 20px; height: 20px; border-radius: 50%; background: var(--color-secondary); box-shadow: 0 6px 14px rgba(0,0,0,.25); opacity: 1; z-index: 3000; transition: transform .6s ease, opacity .6s ease; }
 @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+/* Grade de finalização */
+.final-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 2vw, 20px); margin: 12px 0 8px; }
+.final-item { position: relative; }
+.final-item input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
+.grid-option { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: clamp(16px, 2.4vw, 28px); border: 2px solid #eee; border-radius: 12px; cursor: pointer; transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease; background: #fafafa; min-height: clamp(150px, 24vw, 220px); }
+.grid-option img { width: clamp(72px, 7.6vw, 112px); height: clamp(72px, 7.6vw, 112px); object-fit: contain; }
+.option-title { font-weight: 700; color: var(--color-primary); text-align: center; font-size: clamp(1rem, 1.4vw, 1.3rem); }
+.option-sub { font-size: clamp(.95rem, 1.2vw, 1.15rem); color: var(--color-text); opacity: .8; text-align: center; }
+.grid-option:hover { border-color: var(--color-primary); box-shadow: 0 8px 18px rgba(215, 105, 30, .18); transform: translateY(-1px); }
+.final-item input[type="radio"]:focus + .grid-option { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.final-item input[type="radio"]:checked + .grid-option { border-color: var(--color-secondary); box-shadow: 0 10px 22px rgba(215, 105, 30, .25); background: #fff; }
+
+@media (max-width: 740px) { .final-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .final-grid { grid-template-columns: 1fr; } }

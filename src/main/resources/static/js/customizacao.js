@@ -232,6 +232,89 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkbox) checkbox.addEventListener('change', toggle);
   });
 
+  const addToCartBtn = document.getElementById('add-to-cart-btn');
+
+  function animateToCart(fromEl) {
+    const cart = document.querySelector('.cart-icon');
+    if (!cart) { if (window.renderHeader) renderHeader(); }
+    const cartEl = document.querySelector('.cart-icon');
+    if (!cartEl) { if (fromEl) { fromEl.classList.remove('loading'); fromEl.removeAttribute('disabled'); } return; }
+    const s = fromEl.getBoundingClientRect();
+    const c = cartEl.getBoundingClientRect();
+    const fly = document.createElement('div');
+    fly.className = 'fly-to-cart';
+    fly.style.left = `${s.left + s.width / 2 - 10}px`;
+    fly.style.top = `${s.top + window.scrollY + s.height / 2 - 10}px`;
+    document.body.appendChild(fly);
+    requestAnimationFrame(() => {
+      const dx = c.left + c.width / 2 - (s.left + s.width / 2);
+      const dy = c.top + window.scrollY + c.height / 2 - (s.top + window.scrollY + s.height / 2);
+      fly.style.transform = `translate(${dx}px, ${dy}px) scale(.4)`;
+      fly.style.opacity = '0';
+    });
+    setTimeout(() => {
+      fly.remove();
+      const counter = document.getElementById('cart-counter');
+      if (counter) { counter.classList.add('bump'); setTimeout(() => counter.classList.remove('bump'), 220); }
+      if (fromEl) { fromEl.classList.remove('loading'); fromEl.removeAttribute('disabled'); }
+      document.body.classList.add('page-leave');
+      setTimeout(() => { window.location.href = 'cardapio.html'; }, 200);
+    }, 650);
+  }
+
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', () => {
+      try {
+        addToCartBtn.classList.add('loading');
+        addToCartBtn.setAttribute('disabled', 'true');
+        const toast = document.createElement('div');
+        toast.className = 'add-toast';
+        toast.textContent = 'Item adicionado ao carrinho';
+        document.body.appendChild(toast);
+        const pedidosSalvos = JSON.parse(localStorage.getItem('pedidosSalvos')) || [];
+        const pedido = { ...state, savedAt: new Date().toISOString() };
+        pedidosSalvos.push(pedido);
+        localStorage.setItem('pedidosSalvos', JSON.stringify(pedidosSalvos));
+        const partes = [];
+        partes.push(state.lanche.name);
+        if (state.batata.tamanho) partes.push(`Batata ${state.batata.tamanho}`);
+        if (state.refrigerante.tipo) partes.push(`Refri ${state.refrigerante.tipo}`);
+        if (Array.isArray(state.sobremesas) && state.sobremesas.length) partes.push(`Sobremesas: ${state.sobremesas.join(', ')}`);
+        const nomeItem = partes.join(' + ');
+        const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+        const price = state.subtotal || 0;
+        const existente = carrinho.find(i => i.name === nomeItem && i.price === price);
+        if (existente) existente.quantity += 1; else carrinho.push({ name: nomeItem, price, quantity: 1 });
+        localStorage.setItem('carrinho', JSON.stringify(carrinho));
+        if (window.renderHeader) renderHeader();
+        animateToCart(addToCartBtn);
+        setTimeout(() => { toast.remove(); }, 900);
+      } catch (e) {
+        const modal = document.createElement('div');
+        modal.className = 'confirm-modal show';
+        modal.setAttribute('aria-hidden', 'false');
+        modal.setAttribute('role', 'dialog');
+        modal.innerHTML = `
+          <div class="confirm-backdrop" data-dismiss="error-modal"></div>
+          <div class="confirm-card">
+            <div class="confirm-status"><div class="status-icon success"><i class="fas fa-circle-exclamation"></i></div></div>
+            <h3 class="confirm-title">Erro ao adicionar</h3>
+            <p class="confirm-message">Não foi possível adicionar ao carrinho.</p>
+            <div class="confirm-actions"><button class="btn" data-dismiss="error-modal">OK</button></div>
+            <button type="button" class="confirm-close" title="Fechar" data-dismiss="error-modal"><i class="fas fa-times"></i></button>
+          </div>`;
+        document.body.appendChild(modal);
+        const dismissEls = modal.querySelectorAll('[data-dismiss="error-modal"]');
+        dismissEls.forEach(el => el.addEventListener('click', () => {
+          modal.classList.remove('show');
+          modal.setAttribute('aria-hidden', 'true');
+          setTimeout(() => modal.remove(), 150);
+        }));
+        addToCartBtn.classList.remove('loading');
+        addToCartBtn.removeAttribute('disabled');
+      }
+    });
+  }
 
   batataOptions.forEach(label => {
     const btn = label.querySelector('.remove-batata');

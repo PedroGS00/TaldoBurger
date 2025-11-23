@@ -28,9 +28,32 @@
           <div class="card">
             <h3>Finalização</h3>
             <form id="form-finalizacao" class="final-form">
-              <label class="opt"><input type="radio" name="finalizacao" value="cupom"> QR Code com Cupom (5% off)</label>
-              <label class="opt"><input type="radio" name="finalizacao" value="retirada"> Retirada no local</label>
-              <label class="opt"><input type="radio" name="finalizacao" value="delivery"> Delivery (+ R$ 5,00)</label>
+              <div class="final-grid" role="radiogroup" aria-label="Seleção de finalização do pedido">
+                <div class="final-item">
+                  <input type="radio" name="finalizacao" id="opt-cupom" value="cupom">
+                  <label for="opt-cupom" class="grid-option" aria-label="QR Code com Cupom 5% de desconto">
+                    <img src="img/taldo_cupom.png" alt="Ícone de QR Code Cupom" width="64" height="64">
+                    <span class="option-title">QR Code com Cupom</span>
+                    <span class="option-sub">5% de desconto</span>
+                  </label>
+                </div>
+                <div class="final-item">
+                  <input type="radio" name="finalizacao" id="opt-retirada" value="retirada">
+                  <label for="opt-retirada" class="grid-option" aria-label="Retirada no local">
+                    <img src="img/peça_retira.png" alt="Ícone de retirada no local" width="64" height="64">
+                    <span class="option-title">Retirada no Local</span>
+                    <span class="option-sub">Sem taxas</span>
+                  </label>
+                </div>
+                <div class="final-item">
+                  <input type="radio" name="finalizacao" id="opt-delivery" value="delivery">
+                  <label for="opt-delivery" class="grid-option" aria-label="Entrega por delivery taxa adicional">
+                    <img src="img/delivery.png" alt="Ícone de delivery" width="64" height="64">
+                    <span class="option-title">Delivery</span>
+                    <span class="option-sub">+ R$ 5,00</span>
+                  </label>
+                </div>
+              </div>
               <div class="totais">
                 <div>Subtotal: <strong id="subtotal">R$ 0,00</strong></div>
                 <div id="ajustes"></div>
@@ -38,7 +61,6 @@
               </div>
               <div class="actions">
                 <a href="customizacao.html" class="btn">Voltar</a>
-                <button type="button" class="btn" id="add-to-cart-btn">Adicionar ao Carrinho</button>
                 <button type="submit" class="btn">Confirmar Pedido</button>
               </div>
             </form>
@@ -50,5 +72,36 @@
   <footer class="footer"><div class="container"><p>&copy; 2025 Taldo Burger. Todos os direitos reservados.</p></div></footer>
   <script src="js/auth.js"></script>
   <script src="js/resumo.js"></script>
+  <script>
+    (function(){
+      var params = new URLSearchParams(location.search);
+      if (!params.has('visualTest')) return;
+      var overlay = document.createElement('div');
+      overlay.style.position='fixed';
+      overlay.style.left='10px';
+      overlay.style.top='10px';
+      overlay.style.zIndex='3000';
+      overlay.style.background='rgba(0,0,0,.78)';
+      overlay.style.color='#fff';
+      overlay.style.padding='8px 10px';
+      overlay.style.borderRadius='8px';
+      overlay.style.fontSize='14px';
+      overlay.style.fontFamily='var(--font-primary)';
+      document.body.appendChild(overlay);
+      function update(){
+        var grid = document.querySelector('.final-grid');
+        var item = document.querySelector('.grid-option');
+        var img = document.querySelector('.grid-option img');
+        if (!grid || !item || !img) return;
+        var csG = getComputedStyle(grid);
+        var csI = getComputedStyle(item);
+        var cols = (csG.gridTemplateColumns || '').split(' ').filter(Boolean).length;
+        var info = 'w:'+window.innerWidth+' cols:'+cols+' gap:'+csG.gap+' pad:'+csI.paddingTop+','+csI.paddingRight+','+csI.paddingBottom+','+csI.paddingLeft+' minH:'+csI.minHeight+' img:'+img.clientWidth+'x'+img.clientHeight;
+        overlay.textContent = info;
+      }
+      update();
+      window.addEventListener('resize', update);
+    })();
+  </script>
 </body>
 </html>
